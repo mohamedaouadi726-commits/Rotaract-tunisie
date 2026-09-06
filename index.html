@@ -732,6 +732,24 @@
     </style>
   </head>
   <body>
+    <!-- Ba'd el-drawer w el-forms kol -->
+    </div>
+
+    <!-- 1. Charger Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- 2. El-Script mta'ak feeh el-Keys -->
+    <script>
+      // Sobb el-Keys mta'ak hna fil-lignes hadhom:
+      const SUPABASE_URL = "https://xxxx.supabase.co"; // URL mta' Supabase
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // Anon Key
+
+      // Initialiser Supabase Client
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // El-logic mta' el-site (Login, Clubs, Map...) y'koun hna
+    </script>
     <!-- ================================================================
      VUE PUBLIQUE
      ================================================================ -->
