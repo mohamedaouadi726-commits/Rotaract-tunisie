@@ -231,47 +231,51 @@ p { margin: 0 0 1em; max-width: 62ch; }
 
     <!-- الكود متاع الـ JavaScript (الـ Logic) -->
     <script>
-      // 1. Supabase Config (الـ URL الصحيح)
-      const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // الـ Anon Key متاعك
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  // 1. Supabase Config (من غير /rest/v1/)
+  const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // الـ Anon Key متاعك
 
-      // 2. Gestion de la route #admin
-      function checkAdminRoute() {
-        if (window.location.hash === '#admin') {
-          const adminModal = document.getElementById('adminModal') || document.getElementById('adminDrawer');
-          if (adminModal) {
-            adminModal.classList.remove('hidden');
-            adminModal.style.display = 'block';
-          }
-        }
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // 2. فتح الـ Admin Space فوراً قبل أي Fetch
+  function checkAdminRoute() {
+    if (window.location.hash === '#admin') {
+      const adminModal = document.getElementById('adminModal') || document.getElementById('adminDrawer');
+      const adminToggle = document.getElementById('admin-drawer-toggle');
+      
+      if (adminToggle) {
+        adminToggle.checked = true;
+      } else if (adminModal) {
+        adminModal.classList.remove('hidden');
+        adminModal.style.display = 'block';
       }
+    }
+  }
 
-      // 3. Login Function (مع try/catch باش ما يعطيش Failed to fetch)
-      async function handleLogin(email, password) {
-        try {
-          const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+  // 3. Fetch Data بـ try/catch باش ما يحبسش الموقع
+  async function loadPageData() {
+    try {
+      const { data, error } = await supabaseClient.from('clubs').select('*');
+      if (error) throw error;
+      
+      // كود إظهار الـ presentation والـ clubs
+    } catch (err) {
+      console.error("Erreur Fetch Data:", err);
+      // حتى كان طاح الـ fetch، الـ site والـ admin ما يتبلوكاووش!
+    }
+  }
 
-          if (error) {
-            alert("Erreur: " + error.message);
-            return;
-          }
+  // 4. Lancement
+  window.addEventListener('DOMContentLoaded', () => {
+    checkAdminRoute(); // يحل الـ Admin أولاً
+    loadPageData();    // يجيب الـ Data في العقل
+  });
 
-          alert("Bienvenue Admin!");
-          console.log("Logged in user:", data.user);
-        } catch (err) {
-          console.error("Network Error:", err);
-          alert("Erreur de connexion au serveur Supabase");
-        }
-      }
-
-      // 4. Listeners
-      window.addEventListener('DOMContentLoaded', checkAdminRoute);
-      window.addEventListener('hashchange', checkAdminRoute);
+  window.addEventListener('hashchange', checkAdminRoute);
     </script>
  
 
