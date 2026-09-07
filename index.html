@@ -249,6 +249,31 @@ p { margin: 0 0 1em; max-width: 62ch; }
           alert("Connecté avec succès!");
         }
       }
+       // Function باش تفحص الـ Hash في الـ URL وتفتح الـ Admin Space
+function checkHash() {
+  if (window.location.hash === '#admin') {
+    // 1. تثبّت من الـ ID متاع الـ Drawer أو الـ Modal متاع الـ Admin عندك
+    const adminDrawer = document.getElementById('adminDrawer'); // أعمل الـ ID الصحيح متاع الـ Modal/Drawer
+    
+    if (adminDrawer) {
+      // كانك تستعمل في DaisyUI / Tailwind (Drawer checkbox)
+      const adminCheckbox = document.getElementById('admin-drawer-toggle'); 
+      if (adminCheckbox) {
+        adminCheckbox.checked = true; // يحل الـ Drawer تلقائياً
+      } else {
+        // أو تظهر الـ Element بالـ CSS
+        adminDrawer.classList.remove('hidden');
+        adminDrawer.classList.add('active'); // ولا show
+      }
+    }
+  }
+}
+
+// 1. كي يتحل الـ Page أول مرة ومكتوب فيها #admin
+window.addEventListener('DOMContentLoaded', checkHash);
+
+// 2. كي تبدّل الـ Hash وأنت تمشي في الصفحة (تكتب #admin وتعمل Enter)
+window.addEventListener('hashchange', checkHash);
 
       // Example: Leaflet Map Setup
       // const map = L.map('map').setView([36.8, 10.18], 13);
