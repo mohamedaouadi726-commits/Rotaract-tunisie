@@ -226,91 +226,55 @@ p { margin: 0 0 1em; max-width: 62ch; }
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// 1. Check Hash مباشرة في الأول خالص قبل أي Fetching!
-function checkAdminHash() {
-  if (window.location.hash === '#admin') {
-    const adminDrawer = document.getElementById('adminDrawer'); // الـ ID متاع الـ Drawer
-    const adminToggle = document.getElementById('admin-drawer-toggle'); // كان عندك checkbox toggle
-    
-    if (adminToggle) {
-      adminToggle.checked = true;
-    } else if (adminDrawer) {
-      adminDrawer.classList.remove('hidden');
-    }
-  }
-}
+<!-- SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-// تشغيل الـ Check أول ما تتحل الباج
-document.addEventListener('DOMContentLoaded', () => {
-  checkAdminHash();
-  loadPageData(); // السكربت متاع الـ Fetch تحطو هنا وحدو
-});
+    <!-- الكود متاع الـ JavaScript (الـ Logic) -->
+    <script>
+      // 1. Supabase Config (الـ URL الصحيح)
+      const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // الـ Anon Key متاعك
 
-window.addEventListener('hashchange', checkAdminHash);
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// 2. Fetch Data متاع الـ Clubs مع Protection (try/catch)
-async function loadPageData() {
-  try {
-    const { data, error } = await supabaseClient.from('clubs').select('*');
-    if (error) throw error;
-    
-    // كود إظهار الـ Clubs والـ Presentation
-  } catch (err) {
-    console.error("Erreur lors du chargement des données:", err);
-    // حتى كان طاحت الداتابيز، الموقع ما يتبلوكاش!
-  }
-}
-   const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-  // 1. Supabase Config (تأكد أن الـ URL بلاش /rest/v1/)
-  const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // تحط الـ Anon Key متاعك هنا
-
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // 2. Fonction لتفقد الـ Hash (#admin) وإظهار الـ Admin Modal فوراً
-  function checkAdminRoute() {
-    if (window.location.hash === '#admin') {
-      const adminModal = document.getElementById('adminModal') || document.getElementById('adminDrawer');
-      const adminToggle = document.getElementById('admin-drawer-toggle');
-      
-      if (adminToggle) {
-        adminToggle.checked = true;
-      } else if (adminModal) {
-        adminModal.classList.remove('hidden');
-        adminModal.style.display = 'block';
+      // 2. Gestion de la route #admin
+      function checkAdminRoute() {
+        if (window.location.hash === '#admin') {
+          const adminModal = document.getElementById('adminModal') || document.getElementById('adminDrawer');
+          if (adminModal) {
+            adminModal.classList.remove('hidden');
+            adminModal.style.display = 'block';
+          }
+        }
       }
-    }
-  }
 
-  // 3. Fonction لطلب المعطيات من Supabase بأمان
-  async function loadData() {
-    try {
-      // مثال للـ Fetch متاع الـ Clubs
-      const { data, error } = await supabaseClient.from('clubs').select('*');
-      if (error) throw error;
+      // 3. Login Function (مع try/catch باش ما يعطيش Failed to fetch)
+      async function handleLogin(email, password) {
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
 
-      // هنا تحط الكود اللي يعبّي الـ Presentation والـ Stats...
-      console.log("Data chargée:", data);
+          if (error) {
+            alert("Erreur: " + error.message);
+            return;
+          }
 
-    } catch (err) {
-      console.error("Erreur Fetch Supabase:", err);
-      // حتى كان طاحت الـ Data، الـ Site ما ياقفش!
-    }
-  }
+          alert("Bienvenue Admin!");
+          console.log("Logged in user:", data.user);
+        } catch (err) {
+          console.error("Network Error:", err);
+          alert("Erreur de connexion au serveur Supabase");
+        }
+      }
 
-  // 4. Lancement عند تحميل الصفحة
-  window.addEventListener('DOMContentLoaded', () => {
-    checkAdminRoute(); // يحل الـ Admin أولاً
-    loadData();        // يجيب الـ Data في العقل
-  });
-
-  // كي تبدّل الـ URL وأنت في الصفحة
-  window.addEventListener('hashchange', checkAdminRoute);
-</script>
+      // 4. Listeners
+      window.addEventListener('DOMContentLoaded', checkAdminRoute);
+      window.addEventListener('hashchange', checkAdminRoute);
+    </script>
+  </body>
+</html>
     </script>
 
 <!-- ================================================================
