@@ -223,6 +223,38 @@ p { margin: 0 0 1em; max-width: 62ch; }
 </style>
 </head>
 <body>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- 2. Code JavaScript كامل -->
+    <script>
+      const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // الـ Anon Key متاعك
+
+      // ✅ اكتبها هكا باش ما تجيكش Erreur متاع Identifier already declared
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // --- هنا تحط الكود متاعك الكل ---
+
+      // Example: Login Function
+      async function handleLogin(email, password) {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          alert("Erreur: " + error.message);
+        } else {
+          alert("Connecté avec succès!");
+        }
+      }
+
+      // Example: Leaflet Map Setup
+      // const map = L.map('map').setView([36.8, 10.18], 13);
+      
+      // باقي الـ Functions متاع الـ Admin والـ Clubs تحطهم هنا...
+    </script>
 
 <!-- ================================================================
      VUE PUBLIQUE
