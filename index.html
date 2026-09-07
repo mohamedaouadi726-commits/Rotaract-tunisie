@@ -1257,6 +1257,30 @@ function setupPasswordToggles() {
 // ============================================================
 setupPasswordToggles();
 route();
+   async function handleLogin(e) {
+  e.preventDefault(); // 👈 هذه أهم سطر! كان ما تحطهاش الباج تعمل Reload طيّار وتخرج Failed to fetch
+  
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert("Erreur: " + error.message);
+    return;
+  }
+
+  alert("Mebrouk! Connexion réussie.");
+  window.location.hash = "#dashboard"; // أو الحجة اللي تحب تظهرها
+}  
 </script>
+   <form id="adminLoginForm" onsubmit="handleLogin(event)">
+  <input type="email" id="adminEmail" required />
+  <input type="password" id="adminPassword" required />
+  <button type="submit">Se connecter</button>
+</form>
 </body>
 </html>
