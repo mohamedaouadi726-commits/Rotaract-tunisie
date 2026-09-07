@@ -225,8 +225,35 @@ p { margin: 0 0 1em; max-width: 62ch; }
 <body>
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+   // 1. Initialisation
+const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co"; // من غير /rest/v1/ في الآخر
+const SUPABASE_ANON_KEY = "YOUR_ACTUAL_ANON_KEY_HERE";
 
-   
+// تسمية الـ Client باسم مختلف باش ما يتعارضش مع اسم الـ Library
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 2. Fonction Login
+async function handleLogin(email, password) {
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      console.error("Supabase Auth Error:", error.message);
+      alert("Erreur Login: " + error.message);
+      return;
+    }
+
+    console.log("Success:", data);
+    alert("Connexion réussie !");
+  } catch (err) {
+    console.error("Network/Fetch Error:", err);
+    alert("Failed to fetch: ثبّت في الأنترنات ولاّ الـ AdBlocker ولاّ الـ Project Paused");
+  }
+}
 
 
     </script>
