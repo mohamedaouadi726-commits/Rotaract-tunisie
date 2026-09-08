@@ -223,10 +223,6 @@ p { margin: 0 0 1em; max-width: 62ch; }
 </style>
 </head>
 <body>
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
- 
 
 <!-- ================================================================
      VUE PUBLIQUE
@@ -1257,39 +1253,6 @@ function setupPasswordToggles() {
 // ============================================================
 setupPasswordToggles();
 route();
-   async function handleLogin(e) {
-  e.preventDefault(); // 👈 هذه أهم سطر! كان ما تحطهاش الباج تعمل Reload طيّار وتخرج Failed to fetch
-  
-  const email = document.getElementById('adminEmail').value;
-  const password = document.getElementById('adminPassword').value;
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (error) {
-    alert("Erreur: " + error.message);
-    return;
-  }
-
-  alert("Mebrouk! Connexion réussie.");
-  window.location.hash = "#dashboard"; // أو الحجة اللي تحب تظهرها
-}
-   // ❌ غلط (يعمل Failed to fetch مباشر)
-// const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co/rest/v1/";
-
-// ✅ صحّ (الرابط الصافي فقط)
-const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
-   <form id="adminLoginForm" onsubmit="handleLogin(event)">
-  <input type="email" id="adminEmail" required />
-  <input type="password" id="adminPassword" required />
-  <button type="submit">Se connecter</button>
-</form>
 </script>
 </body>
 </html>
