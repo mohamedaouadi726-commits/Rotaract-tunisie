@@ -1316,25 +1316,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
 
-  // 4. دالة تجيب الـ Data محميّة بـ try/catch
-  async function loadPageData() {
-    try {
-      const { data, error } = await supabaseClient.from('clubs').select('*');
-      if (error) throw error;
-      // هنا الكود اللي يعبي الـ Clubs والـ Presentation
-    } catch (err) {
-      console.error("Erreur Fetch Data (Le site reste fonctionnel):", err);
-    }
-  }
 
-  // 5. التشغيل عند تحميل الصفحة
-  window.addEventListener('DOMContentLoaded', () => {
-    checkAdminRoute(); // 👈 تفقد الـ #admin أُكَد وأول حاجة
-    loadPageData();    // 👈 هبط الـ Data في العقل
-  });
-
-  // كي تكتب #admin وتعمل Enter وأنت في الصفحة
-  window.addEventListener('hashchange', checkAdminRoute);
 </script>
 </body>
 </html>
