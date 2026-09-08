@@ -1290,33 +1290,6 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   <input type="password" id="adminPassword" required />
   <button type="submit">Se connecter</button>
 </form>
-   <!-- 1. استدعاء مكتبة Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-  // 2. التعريفات (تأكد أن الـ URL بلاش /rest/v1/)
-  const SUPABASE_URL = "https://lqsdhavppkzbilajpxig.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJKV1QiLC..."; // الـ Anon Key متاعك
-
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // 3. دالة فتح الـ Admin - تتنفذ فوراً من غير ما تستنى الـ Data
-  function checkAdminRoute() {
-    if (window.location.hash === '#admin') {
-      // ثبت في الـ ID متاع الـ Container متاع الـ Admin عندك
-      const adminModal = document.getElementById('adminModal') || document.getElementById('adminDrawer');
-      const adminToggle = document.getElementById('admin-drawer-toggle');
-      
-      if (adminToggle) {
-        adminToggle.checked = true;
-      } else if (adminModal) {
-        adminModal.classList.remove('hidden');
-        adminModal.style.display = 'block';
-      }
-    }
-  }
-
-
 </script>
 </body>
 </html>
