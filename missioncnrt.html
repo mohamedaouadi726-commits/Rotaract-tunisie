@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notre Mission - Coordination Nationale Rotaract Tunisie</title>
+    <title>Notre Structure - Coordination Nationale Rotaract Tunisie</title>
     <style>
       :root {
         --rotaract-cranberry: #d41b5c;
@@ -57,17 +57,12 @@
         display: inline-block;
         margin-bottom: 1rem;
         opacity: 0.9;
-        transition: opacity 0.2s;
-      }
-      .back-link:hover {
-        opacity: 1;
       }
       .subpage-title {
         color: #ffffff;
         font-size: 2.8rem;
         font-weight: 800;
         margin: 0;
-        line-height: 1.2;
       }
       .content-container {
         max-width: 900px;
@@ -539,23 +534,43 @@
       .leaflet-popup-tip-container {
         top: -20px !important;
       }
+      .coordinator-card { background: #ffffff; border: 1px solid var(--border-light); border-radius: 8px; padding: 22px; display: flex; gap: 16px; align-items: center; margin-top: 24px; }
+      .coordinator-photo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; background: var(--bg-light); flex-shrink: 0; }
+      .coordinator-pill { display: inline-block; font-size: 0.75rem; padding: 3px 9px; border-radius: 999px; background: var(--bg-light); color: var(--text-muted); margin-bottom: 8px; }
     </style>
   </head>
   <body>
+    <div id="public-view">
     <!-- Hero area (Blue space where the image from admin will be applied) -->
-    <header class="subpage-hero" id="mission-hero">
+    <header class="subpage-hero" id="structure-hero">
       <div class="subpage-hero-overlay"></div>
+      <!-- L'image de la structure (si tu en as une) -->
+
       <div class="subpage-hero-content">
-        <a href="index.html" class="back-link">&larr; Retour à l'accueil</a>
-        <h1 class="subpage-title">Notre Mission</h1>
+        <a href="CNRT.html" class="back-link">&larr; Retour à l'accueil</a>
+        <h1 class="subpage-title">Notre Structure</h1>
       </div>
     </header>
 
     <!-- Dynamic Content from Supabase -->
     <main class="content-container">
-      <h2>Fédérer, harmoniser et amplifier l'impact</h2>
-      <div id="mission-text">Chargement de la mission...</div>
+      <h2>Organisation et Gouvernance</h2>
+      <div id="structure-text">Chargement de la structure...</div>
+
+      <div class="coordinator-card">
+        <img class="coordinator-photo" id="coordinator-photo" src="" alt="" style="display:none;">
+        <div>
+          <div class="coordinator-pill">Coordinateur·rice</div>
+          <h3 style="margin-bottom:2px;" id="coordinator-name">—</h3>
+          <p style="margin:0; color: var(--text-muted);" id="coordinator-role">—</p>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 2.5rem;">L'équipe</h2>
+      <div id="team-groups"></div>
+      <p id="team-empty" style="display:none; color: var(--text-muted);">L'équipe n'a pas encore été renseignée.</p>
     </main>
+    </div>
     
     <!-- ================================================================
      VUE ADMIN (accessible via #admin)
@@ -1132,37 +1147,48 @@
 
       const el = (id) => document.getElementById(id);
 
-      async function loadMission() {
+      async function loadStructure() {
         try {
           const { data, error } = await supabaseClient
             .from("coordination_info")
-            .select("mission, mission_image_url")
+            .select("structure, structure_image_url, coordinator_name, coordinator_role, coordinator_photo_url")
             .eq("id", 1)
             .single();
 
           if (error) throw error;
           if (data) {
-            if (data.mission) {
-              document.getElementById("mission-text").textContent =
-                data.mission;
+            if (data.structure) {
+              document.getElementById("structure-text").textContent =
+                data.structure;
             }
-            if (data.mission_image_url) {
+            if (data.structure_image_url) {
               document.getElementById(
-                "mission-hero"
-              ).style.backgroundImage = `linear-gradient(to bottom, rgba(0, 36, 82, 0.2) 0%, rgba(0, 36, 82, 0.9) 100%), url('${data.mission_image_url}')`;
-              document.getElementById("mission-hero").style.backgroundSize =
+                "structure-hero"
+              ).style.backgroundImage = `linear-gradient(to bottom, rgba(0, 36, 82, 0.2) 0%, rgba(0, 36, 82, 0.9) 100%), url('${data.structure_image_url}')`;
+              document.getElementById("structure-hero").style.backgroundSize =
                 "cover";
-              document.getElementById("mission-hero").style.backgroundPosition =
-                "center";
+              document.getElementById(
+                "structure-hero"
+              ).style.backgroundPosition = "center";
+            }
+            document.getElementById("coordinator-name").textContent =
+              data.coordinator_name || "—";
+            document.getElementById("coordinator-role").textContent =
+              data.coordinator_role || "";
+            if (data.coordinator_photo_url) {
+              const photo = document.getElementById("coordinator-photo");
+              photo.src = data.coordinator_photo_url;
+              photo.style.display = "block";
             }
           }
         } catch (err) {
           console.error(err);
-          document.getElementById("mission-text").textContent =
-            "La Coordination Nationale du Rotaract en Tunisie est l'instance représentative et l'organe de liaison central...";
+          document.getElementById("structure-text").textContent =
+            "Sous l'égide du Représentant de District Rotaract (DRR)...";
         }
       }
-      loadMission();
+      loadStructure();
+
  // ============================================================
       // ROUTAGE : #admin bascule sur l'espace admin, tout le reste
       // reste sur le site public. Un seul fichier, deux "pages".
@@ -1193,6 +1219,7 @@
       }
       window.addEventListener("hashchange", route);
 
+      // Lancer le chargement au démarrage de la page publique
       // ============================================================
       // SITE PUBLIC
       // ============================================================
@@ -2322,6 +2349,7 @@
         attribution:
           'Kartendaten: &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
       }).addTo(leafletMap);
+            
     </script>
   </body>
 </html>
