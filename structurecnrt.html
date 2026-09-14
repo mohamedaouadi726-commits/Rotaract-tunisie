@@ -811,7 +811,7 @@
             <span class="helper-text" id="current-structure-img-name"></span>
           </div>
           <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem">Enregistrer la structure</button>
-        
+        </form>
       </div>
     </section>
           <section class="admin-panel" id="panel-account">
@@ -1146,6 +1146,20 @@
       );
 
       const el = (id) => document.getElementById(id);
+      function escapeHtml(str) {
+        return String(str ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
 
       async function loadStructure() {
         try {
@@ -1224,44 +1238,15 @@
       // SITE PUBLIC
       // ============================================================
       function initPublic() {
-        el("year").textContent = new Date().getFullYear();
+        loadTeamOnly();
+      }
 
-        const navToggle = el("nav-toggle");
-        const mainNav = el("main-nav");
-        navToggle.addEventListener("click", () => {
-          const isOpen = mainNav.classList.toggle("open");
-          navToggle.setAttribute("aria-expanded", String(isOpen));
-        });
-        mainNav
-          .querySelectorAll("a")
-          .forEach((a) =>
-            a.addEventListener("click", () => mainNav.classList.remove("open"))
-          );
-
-        leafletMap = L.map("club-map", { scrollWheelZoom: false }).setView(
-          [34.5, 9.5],
-          6.3
-        );
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          maxZoom: 18,
-        }).addTo(leafletMap);
-
-        leafletMap.on("moveend zoomend", updateZonePanel);
-
-        const modal = el("club-modal");
-        el("modal-close").addEventListener("click", () =>
-          modal.classList.remove("open")
-        );
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) modal.classList.remove("open");
-        });
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") modal.classList.remove("open");
-        });
-
-        loadPublicData();
+      async function loadTeamOnly() {
+        const { data: team, error: teamError } = await supabaseClient
+          .from("team_members")
+          .select("*")
+          .order("display_order", { ascending: true });
+        if (!teamError) renderTeam(team || []);
       }
       function makePinIcon(logoUrl, name) {
         const inner = logoUrl
