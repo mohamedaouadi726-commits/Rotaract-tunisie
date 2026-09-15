@@ -547,7 +547,7 @@
       <!-- L'image de la structure (si tu en as une) -->
 
       <div class="subpage-hero-content">
-        <a href="index.html" class="back-link">&larr; Retour à l'accueil</a>
+        <a href="CNRT.html" class="back-link">&larr; Retour à l'accueil</a>
         <h1 class="subpage-title">Notre Structure</h1>
       </div>
     </header>
@@ -1146,6 +1146,7 @@
       );
 
       const el = (id) => document.getElementById(id);
+
       function escapeHtml(str) {
         return String(str ?? "").replace(
           /[&<>"']/g,
@@ -1159,7 +1160,6 @@
             }[c])
         );
       }
-
 
       async function loadStructure() {
         try {
@@ -2328,13 +2328,7 @@
 
       // Appeler le chargement au démarrage de l'admin
       loadAdminCoordinationPages();
-      // Remplace ton L.tileLayer actuel par celui-ci :
-      L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-        maxZoom: 17,
-        attribution:
-          'Kartendaten: &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-      }).addTo(leafletMap);
-            
+
     </script>
   </body>
 </html>
