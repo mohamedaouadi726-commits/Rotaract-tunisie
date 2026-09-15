@@ -1648,7 +1648,7 @@
             </button>
           </form>
           <p class="helper-text" style="margin-top: 18px">
-            <a href="index.html">← Retour au site public</a>
+            <a href="rotaract.html">← Retour au site public</a>
           </p>
         </div>
       </div>
@@ -1805,7 +1805,7 @@
           <span class="helper-text" id="current-structure-img-name"></span>
         </div>
         <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem">Enregistrer la structure</button>
-      
+      </form>
     </div>
   </section>
         <section class="admin-panel" id="panel-account">
@@ -2603,7 +2603,6 @@ window.addEventListener("hashchange", route);
 
         el("mission-form")?.addEventListener("submit", onMissionFormSubmit);
         el("structure-form")?.addEventListener("submit", onStructureFormSubmit);
-        el("content-form").addEventListener("submit", onContentFormSubmit);
         el("add-admin-form").addEventListener("submit", onAddAdminSubmit);
         el("password-form").addEventListener("submit", onPasswordFormSubmit);
 
@@ -2667,7 +2666,6 @@ window.addEventListener("hashchange", route);
 
         showScreen("dashboard");
         loadClubs();
-        loadContent();
         loadTeam();
         if (currentAdminRole === "super_admin") loadAdmins();
       }
@@ -3314,11 +3312,6 @@ window.addEventListener("hashchange", route);
 
       // Appeler le chargement au démarrage de l'admin
       loadAdminCoordinationPages();
-// Remplace ton L.tileLayer actuel par celui-ci :
-L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-    maxZoom: 17,
-    attribution: 'Kartendaten: &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-}).addTo(leafletMap);
 
     </script>
   </body>
