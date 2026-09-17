@@ -1270,6 +1270,8 @@
       .leaflet-popup-tip-container {
         top: -20px !important;
       }
+      .lang-toggle { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; color: inherit; margin-left: 12px; }
+      .lang-toggle:hover { background: rgba(0,0,0,0.05); }
     </style>
   </head>
   <body>
@@ -1288,10 +1290,12 @@
           </a>
           <nav>
             <ul class="main-nav" id="main-nav">
-              <li><a href="#carte">Réseau des clubs</a></li>
-              <li><a href="#clubs">Clubs</a></li>
-              <li><a href="#coordination">À propos</a></li>
+              <li><a href="#carte" data-i18n="nav-network">Réseau des clubs</a></li>
+              <li><a href="#clubs" data-i18n="nav-clubs">Clubs</a></li>
+              <li><a href="#coordination" data-i18n="nav-about">À propos</a></li>
+              <li><a href="evenements.html" data-i18n="nav-events">Événements</a></li>
             </ul>
+            <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
           </nav>
           <button
             class="nav-toggle"
@@ -1319,27 +1323,37 @@
             <!-- Contenu texte à droite (optimisation de l'espace) -->
             <div class="hero-content">
               <div>
-                <span class="hero-header-badge"
+                <span class="hero-header-badge" data-i18n="hero-badge"
                   >District 9010 • Rotary International</span
                 >
-                <h1 class="hero-title">
+                <h1 class="hero-title" data-i18n="hero-title">
                   Coordination Nationale Rotaract Tunisie
                 </h1>
               </div>
 
               <p class="hero-text" id="hero-mission">
-                ....
+                La Coordination Nationale du Rotaract en Tunisie est l'instance
+                représentative et l'organe de liaison central entre l'ensemble
+                des clubs Rotaract répartis sur le territoire tunisien et
+                l'équipe de District (District 9010 du Rotary International).
+                Elle a pour mission de fédérer les clubs, d'harmoniser leurs
+                initiatives et d'amplifier l'impact social et humanitaire de
+                leurs actions. Véritable moteur d'engagement citoyen et de
+                développement du leadership chez les jeunes, la Coordination
+                impulse les actions nationales conjointes, facilite le partage
+                de bonnes pratiques et veille au rayonnement des valeurs du
+                Rotaract et du Rotary à l'échelle nationale et internationale.
               </p>
 
               <!-- Compteurs statistiques directement sous la présentation -->
               <div class="hero-stats-row">
                 <div class="stat-item">
                   <span class="stat-number" id="stat-clubs">—</span>
-                  <span class="stat-text">clubs actifs</span>
+                  <span class="stat-text" data-i18n="stat-clubs-label">clubs actifs</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-number" id="stat-zones">—</span>
-                  <span class="stat-text">zones couvertes</span>
+                  <span class="stat-text" data-i18n="stat-zones-label">zones couvertes</span>
                 </div>
               </div>
             </div>
@@ -1350,7 +1364,7 @@
           <div class="container">
             <div class="map-frame"><div id="club-map"></div></div>
             <div class="zone-panel" id="zone-panel">
-              <p class="zone-panel-hint" id="zone-panel-hint">
+              <p class="zone-panel-hint" id="zone-panel-hint" data-i18n="map-hint">
                 🔍 Zoomez sur une zone de la carte pour voir les clubs qui s'y
                 trouvent, sous forme de destinations.
               </p>
@@ -1363,13 +1377,13 @@
         <section class="clubs-section" id="clubs">
           <div class="container">
             <div class="section-head">
-              <h2>Les clubs</h2>
-              <p class="lede">
+              <h2 data-i18n="clubs-title">Les clubs</h2>
+              <p class="lede" data-i18n="clubs-lede">
                 Cliquez sur un logo pour voir les coordonnées du club.
               </p>
             </div>
             <div class="club-grid" id="club-grid"></div>
-            <div class="empty-state" id="clubs-empty" style="display: none">
+            <div class="empty-state" id="clubs-empty" style="display: none" data-i18n="clubs-empty">
               Aucun club n'est publié pour le moment.
             </div>
           </div>
@@ -1387,6 +1401,7 @@
                 font-size: 1.8rem;
                 margin-bottom: 2rem;
               "
+              data-i18n="coordination-title"
             >
               La coordination
             </h2>
@@ -1394,7 +1409,7 @@
             <div
               style="
                 display: grid;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 gap: 2rem;
                 align-items: start;
               "
@@ -1421,6 +1436,7 @@
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
                   "
+                  data-i18n="card-mission-label"
                   >En savoir plus</span
                 >
                 <h3
@@ -1429,6 +1445,7 @@
                     font-size: 1.4rem;
                     margin: 0.5rem 0 1rem 0;
                   "
+                  data-i18n="card-mission-title"
                 >
                   Notre Mission
                 </h3>
@@ -1439,6 +1456,7 @@
                     line-height: 1.6;
                     margin: 0;
                   "
+                  data-i18n="card-mission-desc"
                 >
                   Découvrez en détail l'instance représentative, l'organe de
                   liaison central et notre engagement auprès de l'ensemble des
@@ -1454,6 +1472,7 @@
                     align-items: center;
                     gap: 0.5rem;
                   "
+                  data-i18n="card-mission-cta"
                 >
                   Lire la suite &rarr;
                 </div>
@@ -1481,6 +1500,7 @@
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
                   "
+                  data-i18n="card-structure-label"
                   >Organisation</span
                 >
                 <h3
@@ -1489,6 +1509,7 @@
                     font-size: 1.4rem;
                     margin: 0.5rem 0 1rem 0;
                   "
+                  data-i18n="card-structure-title"
                 >
                   Notre Structure
                 </h3>
@@ -1499,6 +1520,7 @@
                     line-height: 1.6;
                     margin: 0;
                   "
+                  data-i18n="card-structure-desc"
                 >
                   Explorez l'organisation sous l'égide du Représentant de
                   District et les commissions thématiques qui font vivre notre
@@ -1514,8 +1536,72 @@
                     align-items: center;
                     gap: 0.5rem;
                   "
+                  data-i18n="card-structure-cta"
                 >
                   Découvrir la structure &rarr;
+                </div>
+              </a>
+
+              <!-- Carte cliquable Événements -->
+              <a
+                href="evenements.html"
+                class="subpage-card-link"
+                style="
+                  text-decoration: none;
+                  background: #ffffff;
+                  border: 1px solid var(--border-light);
+                  border-radius: 8px;
+                  padding: 2rem;
+                  display: block;
+                  transition: all 0.2s ease;
+                "
+              >
+                <span
+                  style="
+                    color: var(--rotaract-cranberry);
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                  "
+                  data-i18n="card-events-label"
+                  >Agenda</span
+                >
+                <h3
+                  style="
+                    color: var(--rotaract-navy);
+                    font-size: 1.4rem;
+                    margin: 0.5rem 0 1rem 0;
+                  "
+                  data-i18n="card-events-title"
+                >
+                  Nos Événements
+                </h3>
+                <p
+                  style="
+                    color: var(--text-muted);
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    margin: 0;
+                  "
+                  data-i18n="card-events-desc"
+                >
+                  Retrouvez les prochains rendez-vous, formations et
+                  rencontres organisés par la coordination nationale.
+                </p>
+                <div
+                  style="
+                    margin-top: 1.5rem;
+                    color: var(--rotaract-cranberry);
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                  "
+                  data-i18n="card-events-cta"
+                >
+                  Voir l'agenda &rarr;
                 </div>
               </a>
             </div>
@@ -1638,7 +1724,7 @@
             </button>
           </form>
           <p class="helper-text" style="margin-top: 18px">
-            <a href="index.html">← Retour au site public</a>
+            <a href="rotaract.html">← Retour au site public</a>
           </p>
         </div>
       </div>
@@ -2154,6 +2240,87 @@
             }[c])
         );
       }
+
+      const I18N = {
+        fr: {
+          "nav-network": "Réseau des clubs",
+          "nav-clubs": "Clubs",
+          "nav-about": "À propos",
+          "nav-events": "Événements",
+          "hero-badge": "District 9010 • Rotary International",
+          "hero-title": "Coordination Nationale Rotaract Tunisie",
+          "stat-clubs-label": "clubs actifs",
+          "stat-zones-label": "zones couvertes",
+          "map-hint": "🔍 Zoomez sur une zone de la carte pour voir les clubs qui s'y trouvent, sous forme de destinations.",
+          "clubs-title": "Les clubs",
+          "clubs-lede": "Cliquez sur un logo pour voir les coordonnées du club.",
+          "clubs-empty": "Aucun club n'est publié pour le moment.",
+          "coordination-title": "La coordination",
+          "card-mission-label": "En savoir plus",
+          "card-mission-title": "Notre Mission",
+          "card-mission-desc": "Découvrez en détail l'instance représentative, l'organe de liaison central et notre engagement auprès de l'ensemble des clubs Rotaract en Tunisie.",
+          "card-mission-cta": "Lire la suite →",
+          "card-structure-label": "Organisation",
+          "card-structure-title": "Notre Structure",
+          "card-structure-desc": "Explorez l'organisation sous l'égide du Représentant de District et les commissions thématiques qui font vivre notre réseau.",
+          "card-structure-cta": "Découvrir la structure →",
+          "card-events-label": "Agenda",
+          "card-events-title": "Nos Événements",
+          "card-events-desc": "Retrouvez les prochains rendez-vous, formations et rencontres organisés par la coordination nationale.",
+          "card-events-cta": "Voir l'agenda →",
+        },
+        en: {
+          "nav-network": "Club network",
+          "nav-clubs": "Clubs",
+          "nav-about": "About",
+          "nav-events": "Events",
+          "hero-badge": "District 9010 • Rotary International",
+          "hero-title": "Rotaract Tunisia National Coordination",
+          "stat-clubs-label": "active clubs",
+          "stat-zones-label": "zones covered",
+          "map-hint": "🔍 Zoom in on a zone of the map to see the clubs located there.",
+          "clubs-title": "The clubs",
+          "clubs-lede": "Click a logo to see the club's details.",
+          "clubs-empty": "No club has been published yet.",
+          "coordination-title": "The coordination",
+          "card-mission-label": "Learn more",
+          "card-mission-title": "Our Mission",
+          "card-mission-desc": "Discover the representative body and central liaison office, and our commitment to all Rotaract clubs in Tunisia.",
+          "card-mission-cta": "Read more →",
+          "card-structure-label": "Organization",
+          "card-structure-title": "Our Structure",
+          "card-structure-desc": "Explore the organization led by the District Representative and the thematic commissions that drive our network.",
+          "card-structure-cta": "Discover the structure →",
+          "card-events-label": "Agenda",
+          "card-events-title": "Our Events",
+          "card-events-desc": "Find upcoming meetups, trainings and gatherings organized by the national coordination.",
+          "card-events-cta": "View the agenda →",
+        },
+      };
+
+      function applyLanguage(lang) {
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          const key = node.getAttribute("data-i18n");
+          if (I18N[lang] && I18N[lang][key]) node.textContent = I18N[lang][key];
+        });
+        const toggle = document.getElementById("lang-toggle");
+        if (toggle) toggle.textContent = lang === "fr" ? "EN" : "FR";
+        localStorage.setItem("site-lang", lang);
+        document.documentElement.lang = lang;
+      }
+
+      function initLanguageToggle() {
+        const saved = localStorage.getItem("site-lang") || "fr";
+        applyLanguage(saved);
+        const toggle = document.getElementById("lang-toggle");
+        if (toggle) {
+          toggle.addEventListener("click", () => {
+            const current = localStorage.getItem("site-lang") || "fr";
+            applyLanguage(current === "fr" ? "en" : "fr");
+          });
+        }
+      }
+      initLanguageToggle();
 
       // ============================================================
 // ROUTAGE : #admin bascule sur l'espace admin, tout le reste
@@ -3302,6 +3469,10 @@ window.addEventListener("hashchange", route);
 
       // Appeler le chargement au démarrage de l'admin
       loadAdminCoordinationPages();
+
+    </script>
+  </body>
+</html>
 
     </script>
   </body>
