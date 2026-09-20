@@ -1773,6 +1773,7 @@
             <li><button data-panel="panel-team">Équipe</button></li>
            <li><button class="tab-btn" data-panel="panel-mission">Mission</button></li>
             <li><button class="tab-btn" data-panel="panel-structure">Structure</button></li>
+            <li><button class="tab-btn" data-panel="panel-events">Événements</button></li>
             <li><button data-panel="panel-account">Mon compte</button></li>
             <li><button data-panel="panel-admins">Administrateurs</button></li>
           </ul>
@@ -1884,6 +1885,85 @@
       </form>
     </div>
   </section>
+    <section class="admin-panel" id="panel-events">
+      <div class="container">
+        <div class="panel-head">
+          <h2 style="margin: 0">Événements de la coordination</h2>
+          <button class="btn btn-primary" id="add-event-btn">
+            + Ajouter un événement
+          </button>
+        </div>
+        <div id="events-feedback"></div>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Titre</th>
+                <th>Date</th>
+                <th>Lieu</th>
+                <th>Ordre</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="events-table-body">
+              <tr>
+                <td colspan="6">Chargement…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="drawer-backdrop" id="events-drawer-backdrop">
+          <div class="drawer">
+            <h3 id="events-drawer-title">Ajouter un événement</h3>
+            <div id="events-form-feedback"></div>
+            <form id="events-form">
+              <input type="hidden" id="event-id" />
+              <div class="field">
+                <label for="event-title">Titre *</label
+                ><input type="text" id="event-title" required />
+              </div>
+              <div class="field">
+                <label for="event-date">Date *</label
+                ><input type="date" id="event-date" required />
+              </div>
+              <div class="field">
+                <label for="event-location">Lieu</label
+                ><input type="text" id="event-location" placeholder="ex. Tunis, en ligne…" />
+              </div>
+              <div class="field">
+                <label for="event-description">Description</label>
+                <textarea id="event-description" rows="4"></textarea>
+              </div>
+              <div class="field">
+                <label for="event-order">Ordre d'affichage</label
+                ><input type="number" step="1" id="event-order" placeholder="0" />
+              </div>
+              <div class="field">
+                <label for="event-photo">Image</label
+                ><input type="file" id="event-photo" accept="image/*" /><span
+                  class="helper-text"
+                  id="current-event-photo-name"
+                ></span>
+              </div>
+              <div style="display: flex; gap: 10px; margin-top: 20px">
+                <button type="submit" class="btn btn-primary" id="event-save-btn">
+                  Enregistrer
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  id="event-cancel-btn"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
         <section class="admin-panel" id="panel-account">
           <div class="container" style="max-width: 480px">
             <div class="panel-head"><h2 style="margin: 0">Mon compte</h2></div>
@@ -2760,6 +2840,17 @@ window.addEventListener("hashchange", route);
 
         el("mission-form")?.addEventListener("submit", onMissionFormSubmit);
         el("structure-form")?.addEventListener("submit", onStructureFormSubmit);
+
+        const eventsDrawerBackdrop = el("events-drawer-backdrop");
+        el("add-event-btn").addEventListener("click", () =>
+          openEventDrawer(null)
+        );
+        el("event-cancel-btn").addEventListener("click", closeEventDrawer);
+        eventsDrawerBackdrop.addEventListener("click", (e) => {
+          if (e.target === eventsDrawerBackdrop) closeEventDrawer();
+        });
+        el("events-form").addEventListener("submit", onEventFormSubmit);
+
         el("add-admin-form").addEventListener("submit", onAddAdminSubmit);
         el("password-form").addEventListener("submit", onPasswordFormSubmit);
 
@@ -2823,6 +2914,7 @@ window.addEventListener("hashchange", route);
 
         showScreen("dashboard");
         loadClubs();
+        loadEventsAdmin();
         loadTeam();
         if (currentAdminRole === "super_admin") loadAdmins();
       }
@@ -3089,6 +3181,159 @@ window.addEventListener("hashchange", route);
       // ============================================================
       // ÉQUIPE
       // ============================================================
+      let eventsCache = [];
+
+      async function loadEventsAdmin() {
+        const { data, error } = await supabaseClient
+          .from("events")
+          .select("*")
+          .order("event_date", { ascending: true });
+        const tbody = el("events-table-body");
+        if (error) {
+          tbody.innerHTML = `<tr><td colspan="6">Erreur de chargement.</td></tr>`;
+          return;
+        }
+        eventsCache = data || [];
+        renderEventsTable(eventsCache);
+      }
+
+      function renderEventsTable(events) {
+        const tbody = el("events-table-body");
+        if (!events.length) {
+          tbody.innerHTML = `<tr><td colspan="6">Aucun événement pour le moment.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = events
+          .map(
+            (ev) => `
+    <tr>
+      <td>${
+        ev.image_url
+          ? `<img class="table-logo" src="${ev.image_url}" alt="">`
+          : `<div class="table-logo"></div>`
+      }</td>
+      <td>${escapeHtml(ev.title || "")}</td>
+      <td>${escapeHtml(ev.event_date || "")}</td>
+      <td>${escapeHtml(ev.location || "")}</td>
+      <td>${ev.display_order ?? 0}</td>
+      <td><div class="table-actions"><button data-action="edit" data-id="${
+        ev.id
+      }">Modifier</button><button data-action="delete" data-id="${
+              ev.id
+            }">Supprimer</button></div></td>
+    </tr>`
+          )
+          .join("");
+
+        tbody
+          .querySelectorAll('button[data-action="edit"]')
+          .forEach((btn) =>
+            btn.addEventListener("click", () => openEventDrawer(btn.dataset.id))
+          );
+        tbody
+          .querySelectorAll('button[data-action="delete"]')
+          .forEach((btn) =>
+            btn.addEventListener("click", () => deleteEvent(btn.dataset.id))
+          );
+      }
+
+      function openEventDrawer(eventId) {
+        showFeedback("events-form-feedback", "");
+        el("events-form").reset();
+        el("current-event-photo-name").textContent = "";
+
+        if (eventId) {
+          const ev = eventsCache.find((e) => e.id === eventId);
+          el("events-drawer-title").textContent = "Modifier l'événement";
+          el("event-id").value = ev.id;
+          el("event-title").value = ev.title || "";
+          el("event-date").value = ev.event_date || "";
+          el("event-location").value = ev.location || "";
+          el("event-description").value = ev.description || "";
+          el("event-order").value = ev.display_order ?? 0;
+          if (ev.image_url)
+            el("current-event-photo-name").textContent =
+              "Image actuelle conservée si aucun nouveau fichier n'est choisi.";
+        } else {
+          el("events-drawer-title").textContent = "Ajouter un événement";
+          el("event-id").value = "";
+          el("event-order").value = eventsCache.length;
+        }
+        el("events-drawer-backdrop").classList.add("open");
+      }
+
+      function closeEventDrawer() {
+        el("events-drawer-backdrop").classList.remove("open");
+      }
+
+      async function onEventFormSubmit(e) {
+        e.preventDefault();
+        showFeedback("events-form-feedback", "");
+        el("event-save-btn").disabled = true;
+        el("event-save-btn").textContent = "Enregistrement…";
+
+        try {
+          const id = el("event-id").value || null;
+          const payload = {
+            title: el("event-title").value.trim(),
+            event_date: el("event-date").value,
+            location: el("event-location").value.trim(),
+            description: el("event-description").value.trim(),
+            display_order: el("event-order").value
+              ? Number(el("event-order").value)
+              : 0,
+          };
+          const photoFile = el("event-photo").files[0];
+          if (photoFile)
+            payload.image_url = await uploadImage(photoFile, "events");
+
+          let error;
+          if (id)
+            ({ error } = await supabaseClient
+              .from("events")
+              .update(payload)
+              .eq("id", id));
+          else
+            ({ error } = await supabaseClient.from("events").insert(payload));
+          if (error) throw error;
+
+          closeEventDrawer();
+          showFeedback(
+            "events-feedback",
+            "Événement enregistré avec succès.",
+            "success"
+          );
+          loadEventsAdmin();
+        } catch (err) {
+          console.error(err);
+          showFeedback(
+            "events-form-feedback",
+            err.message || "Une erreur est survenue."
+          );
+        } finally {
+          el("event-save-btn").disabled = false;
+          el("event-save-btn").textContent = "Enregistrer";
+        }
+      }
+
+      async function deleteEvent(id) {
+        const ev = eventsCache.find((e) => e.id === id);
+        if (!confirm(`Supprimer l'événement « ${ev?.title ?? ""} » ?`)) return;
+        const { error } = await supabaseClient
+          .from("events")
+          .delete()
+          .eq("id", id);
+        if (error) {
+          showFeedback(
+            "events-feedback",
+            "Suppression impossible : " + error.message
+          );
+          return;
+        }
+        showFeedback("events-feedback", "Événement supprimé.", "success");
+        loadEventsAdmin();
+      }
+
       let teamCache = [];
 
       const TEAM_CATEGORY_LABELS = {
@@ -3469,10 +3714,6 @@ window.addEventListener("hashchange", route);
 
       // Appeler le chargement au démarrage de l'admin
       loadAdminCoordinationPages();
-
-    </script>
-  </body>
-</html>
 
     </script>
   </body>
