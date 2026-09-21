@@ -1781,7 +1781,7 @@
             <li>
               <button class="active" data-panel="panel-clubs">Clubs</button>
             </li>
-            
+            <li><button class="tab-btn" data-panel="panel-home">Accueil</button></li>
             <li><button data-panel="panel-team">Équipe</button></li>
            <li><button class="tab-btn" data-panel="panel-mission">Mission</button></li>
             <li><button class="tab-btn" data-panel="panel-structure">Structure</button></li>
@@ -1821,7 +1821,29 @@
           </div>
         </section>
 
-        
+        <section class="admin-panel" id="panel-home">
+          <div class="container" style="max-width: 640px">
+            <div class="panel-head">
+              <h2 style="margin: 0">Gestion du texte d'accueil</h2>
+            </div>
+            <div id="home-feedback"></div>
+            <form id="home-form">
+              <div class="field" style="margin-top: 1.5rem">
+                <label for="admin-home-text">Texte d'accueil (Français)</label>
+                <textarea id="admin-home-text" rows="3"></textarea>
+              </div>
+              <div class="field">
+                <label for="admin-home-text-en">Texte d'accueil (English)</label>
+                <textarea id="admin-home-text-en" rows="3"></textarea>
+              </div>
+              <div class="field">
+                <label for="admin-home-text-ar">نص الصفحة الرئيسية (Arabe)</label>
+                <textarea id="admin-home-text-ar" rows="3" dir="rtl"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem">Enregistrer</button>
+            </form>
+          </div>
+        </section>
 
         <section class="admin-panel" id="panel-team">
           <div class="container">
@@ -2318,6 +2340,7 @@
       );
 
       const el = (id) => document.getElementById(id);
+      let homeDataCache = null;
 
       function escapeHtml(str) {
         return String(str ?? "").replace(
@@ -2432,6 +2455,7 @@
         localStorage.setItem("site-lang", lang);
         document.documentElement.lang = lang;
         document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+        if (typeof renderHomeText === "function") renderHomeText();
       }
 
       function initLanguageToggle() {
@@ -2722,7 +2746,18 @@ window.addEventListener("hashchange", route);
 
       function renderCoordinationInfo(info) {
         if (!info) return;
-        el("hero-mission").textContent = info.mission || "";
+        homeDataCache = info;
+        renderHomeText();
+      }
+
+      function renderHomeText() {
+        if (!homeDataCache) return;
+        const lang = localStorage.getItem("site-lang") || "fr";
+        const text =
+          (lang !== "fr" && homeDataCache[`home_intro_${lang}`]) ||
+          homeDataCache.home_intro ||
+          "";
+        el("hero-mission").textContent = text;
       }
 
       const TEAM_CATEGORIES = [
@@ -2904,6 +2939,7 @@ window.addEventListener("hashchange", route);
         });
         el("team-form").addEventListener("submit", onTeamFormSubmit);
 
+        el("home-form")?.addEventListener("submit", onHomeFormSubmit);
         el("mission-form")?.addEventListener("submit", onMissionFormSubmit);
         el("structure-form")?.addEventListener("submit", onStructureFormSubmit);
 
@@ -3011,6 +3047,36 @@ window.addEventListener("hashchange", route);
       // ------------------------------------------------------------
       // Enregistrement Mission / Structure (Supabase, source unique)
       // ------------------------------------------------------------
+      async function onHomeFormSubmit(e) {
+        e.preventDefault();
+        showFeedback("home-feedback", "");
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalLabel = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Enregistrement...";
+        try {
+          const payload = {
+            home_intro: el("admin-home-text").value.trim(),
+            home_intro_en: el("admin-home-text-en").value.trim(),
+            home_intro_ar: el("admin-home-text-ar").value.trim(),
+          };
+          const { error } = await supabaseClient
+            .from("coordination_info")
+            .update(payload)
+            .eq("id", 1);
+          if (error) throw error;
+
+          showFeedback("home-feedback", "Texte d'accueil enregistré avec succès.", "success");
+          if (typeof loadAdminCoordinationPages === "function") loadAdminCoordinationPages();
+        } catch (err) {
+          console.error(err);
+          showFeedback("home-feedback", err.message || "Une erreur est survenue.");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }
+      }
+
       async function onMissionFormSubmit(e) {
         e.preventDefault();
         showFeedback("mission-feedback", "");
@@ -3768,6 +3834,14 @@ window.addEventListener("hashchange", route);
           .eq("id", 1)
           .single();
         if (data) {
+          if (document.getElementById("admin-home-text")) {
+            document.getElementById("admin-home-text").value =
+              data.home_intro || "";
+            document.getElementById("admin-home-text-en").value =
+              data.home_intro_en || "";
+            document.getElementById("admin-home-text-ar").value =
+              data.home_intro_ar || "";
+          }
           if (document.getElementById("admin-mission-text")) {
             document.getElementById("admin-mission-text").value =
               data.mission || "";
