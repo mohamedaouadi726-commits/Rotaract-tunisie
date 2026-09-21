@@ -593,21 +593,14 @@
       <div class="subpage-hero-overlay"></div>
 
       <div class="subpage-hero-content">
-        <a href="index.html" class="back-link" data-i18n="back">&larr; Retour à l'accueil</a>
+        <a href="CNRT.html" class="back-link" data-i18n="back">&larr; Retour à l'accueil</a>
         <h1 class="subpage-title" data-i18n="title">Nos Événements</h1>
-        <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
-        <button class="theme-toggle" id="theme-toggle" type="button">🌙</button>
       </div>
     </header>
 
     <!-- Dynamic Content from Supabase -->
     <main class="content-container">
-      <div id="events-current-section" style="display:none;">
-        <h2 data-i18n="current">Événements en cours (Aujourd'hui)</h2>
-        <div class="events-past-grid" id="events-current-grid"></div>
-      </div>
-
-      <h2 style="margin-top: 2.5rem;" data-i18n="upcoming">Événements à venir</h2>
+      <h2 data-i18n="upcoming">Événements à venir</h2>
       <div class="events-slider-wrap">
         <button class="events-slider-btn events-slider-prev" id="events-prev" aria-label="Précédent">&larr;</button>
         <div class="events-slider" id="events-slider"></div>
@@ -1349,7 +1342,6 @@
             const idx = LANG_CYCLE.indexOf(current);
             const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
             applyLanguage(next);
-            renderCurrentEvents();
             renderEventsSlider();
             renderPastEvents();
           });
@@ -1380,7 +1372,6 @@
       let eventsData = [];
       let eventsIndex = 0;
       let eventsPast = [];
-      let eventsCurrent = [];
 
       async function loadEvents() {
         try {
@@ -1391,50 +1382,17 @@
           if (error) throw error;
           const all = data || [];
           const todayStr = new Date().toISOString().slice(0, 10);
-          eventsCurrent = all.filter((ev) => ev.event_date === todayStr);
-          eventsData = all.filter((ev) => ev.event_date > todayStr);
+          eventsData = all.filter((ev) => ev.event_date >= todayStr);
           eventsPast = all
             .filter((ev) => ev.event_date < todayStr)
             .sort((a, b) => (a.event_date < b.event_date ? 1 : -1));
           eventsIndex = 0;
-          renderCurrentEvents();
           renderEventsSlider();
           renderPastEvents();
         } catch (err) {
           console.error(err);
           el("events-empty").style.display = "block";
         }
-      }
-
-      function renderCurrentEvents() {
-        const grid = el("events-current-grid");
-        const section = el("events-current-section");
-        if (!grid || !section) return;
-        if (!eventsCurrent.length) {
-          grid.innerHTML = "";
-          section.style.display = "none";
-          return;
-        }
-        section.style.display = "block";
-        grid.innerHTML = eventsCurrent
-          .map(
-            (ev, i) => `
-          <div class="event-card-mini event-card-current" data-idx="${i}">
-            ${
-              ev.image_url
-                ? `<img src="${escapeHtml(ev.image_url)}" alt="">`
-                : ""
-            }
-            <div class="event-date-pill event-date-pill-live">${escapeHtml(formatEventDate(ev.event_date))}</div>
-            <h4 style="margin: 6px 0 0;">${escapeHtml(eventText(ev, "title"))}</h4>
-          </div>`
-          )
-          .join("");
-        grid.querySelectorAll(".event-card-mini").forEach((card) =>
-          card.addEventListener("click", () =>
-            openEventModal(eventsCurrent[Number(card.dataset.idx)])
-          )
-        );
       }
 
       function renderPastEvents() {
