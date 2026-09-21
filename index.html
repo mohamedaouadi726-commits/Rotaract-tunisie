@@ -53,6 +53,17 @@
         --shadow: 0 12px 30px -12px rgba(22, 33, 62, 0.18);
         --max-width: 1120px;
       }
+      :root[data-theme="dark"] {
+        --paper: #0f1420;
+        --surface: #161d2e;
+        --ink: #e8ecf3;
+        --ink-soft: #9aa5b8;
+        --line: #2a3345;
+        --line-soft: #232c3d;
+      }
+      :root[data-theme="dark"] body { background-color: var(--paper); }
+      .theme-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; color: #fff; margin-left: 8px; }
+      .theme-toggle:hover { background: rgba(255,255,255,0.15); }
       * {
         box-sizing: border-box;
       }
@@ -1296,6 +1307,7 @@
               <li><a href="evenements.html" data-i18n="nav-events">Événements</a></li>
             </ul>
             <button class="lang-toggle" id="lang-toggle" type="button">EN</button>
+            <button class="theme-toggle" id="theme-toggle" type="button">🌙</button>
           </nav>
           <button
             class="nav-toggle"
@@ -2378,15 +2390,48 @@
         },
       };
 
+      I18N.ar = {
+        "nav-network": "شبكة الأندية",
+        "nav-clubs": "الأندية",
+        "nav-about": "من نحن",
+        "nav-events": "الفعاليات",
+        "hero-badge": "المنطقة 9010 • الروتاري الدولي",
+        "hero-title": "التنسيق الوطني للروتاراكت تونس",
+        "stat-clubs-label": "نادٍ نشط",
+        "stat-zones-label": "منطقة مغطاة",
+        "map-hint": "🔍 قم بتكبير منطقة على الخريطة لرؤية الأندية الموجودة فيها.",
+        "clubs-title": "الأندية",
+        "clubs-lede": "انقر على الشعار لرؤية تفاصيل النادي.",
+        "clubs-empty": "لم يتم نشر أي ناد بعد.",
+        "coordination-title": "التنسيق",
+        "card-mission-label": "اعرف أكثر",
+        "card-mission-title": "مهمتنا",
+        "card-mission-desc": "اكتشف الهيئة التمثيلية ومكتب الاتصال المركزي والتزامنا تجاه جميع أندية الروتاراكت في تونس.",
+        "card-mission-cta": "اقرأ المزيد ←",
+        "card-structure-label": "التنظيم",
+        "card-structure-title": "هيكلنا",
+        "card-structure-desc": "استكشف التنظيم بقيادة ممثل المنطقة واللجان المواضيعية التي تحرك شبكتنا.",
+        "card-structure-cta": "اكتشف الهيكل ←",
+        "card-events-label": "الأجندة",
+        "card-events-title": "فعالياتنا",
+        "card-events-desc": "اكتشف اللقاءات والتداريب القادمة التي ينظمها التنسيق الوطني.",
+        "card-events-cta": "شاهد الأجندة ←",
+      };
+
+      const LANG_CYCLE = ["fr", "en", "ar"];
+      const NEXT_LABEL = { fr: "EN", en: "AR", ar: "FR" };
+
       function applyLanguage(lang) {
+        if (!LANG_CYCLE.includes(lang)) lang = "fr";
         document.querySelectorAll("[data-i18n]").forEach((node) => {
           const key = node.getAttribute("data-i18n");
           if (I18N[lang] && I18N[lang][key]) node.textContent = I18N[lang][key];
         });
         const toggle = document.getElementById("lang-toggle");
-        if (toggle) toggle.textContent = lang === "fr" ? "EN" : "FR";
+        if (toggle) toggle.textContent = NEXT_LABEL[lang];
         localStorage.setItem("site-lang", lang);
         document.documentElement.lang = lang;
+        document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
       }
 
       function initLanguageToggle() {
@@ -2396,11 +2441,32 @@
         if (toggle) {
           toggle.addEventListener("click", () => {
             const current = localStorage.getItem("site-lang") || "fr";
-            applyLanguage(current === "fr" ? "en" : "fr");
+            const idx = LANG_CYCLE.indexOf(current);
+            applyLanguage(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length]);
           });
         }
       }
       initLanguageToggle();
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("site-theme", theme);
+        const toggle = document.getElementById("theme-toggle");
+        if (toggle) toggle.textContent = theme === "dark" ? "☀️" : "🌙";
+      }
+
+      function initThemeToggle() {
+        const saved = localStorage.getItem("site-theme") || "light";
+        applyTheme(saved);
+        const toggle = document.getElementById("theme-toggle");
+        if (toggle) {
+          toggle.addEventListener("click", () => {
+            const current = localStorage.getItem("site-theme") || "light";
+            applyTheme(current === "light" ? "dark" : "light");
+          });
+        }
+      }
+      initThemeToggle();
 
       // ============================================================
 // ROUTAGE : #admin bascule sur l'espace admin, tout le reste
