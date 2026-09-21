@@ -12,7 +12,25 @@
         --text-dark: #1e293b;
         --text-muted: #64748b;
         --border-light: #e2e8f0;
+        --surface: #ffffff;
       }
+      :root[data-theme="dark"] {
+        --bg-light: #0f1420;
+        --text-dark: #e8ecf3;
+        --text-muted: #9aa5b8;
+        --border-light: #2a3345;
+        --surface: #161d2e;
+      }
+      :root[data-theme="dark"] .content-container,
+      :root[data-theme="dark"] .team-card,
+      :root[data-theme="dark"] .coordinator-card {
+        background: var(--surface) !important;
+        color: var(--text-dark);
+      }
+      .theme-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; color: #fff; margin-left: 8px; }
+      .theme-toggle:hover { background: rgba(255,255,255,0.15); }
+      .lang-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; color: #fff; margin-left: 12px; }
+      .lang-toggle:hover { background: rgba(255,255,255,0.15); }
       body {
         margin: 0;
         background-color: var(--bg-light);
@@ -547,14 +565,14 @@
     <header class="subpage-hero" id="mission-hero">
       <div class="subpage-hero-overlay"></div>
       <div class="subpage-hero-content">
-        <a href="index.html" class="back-link">&larr; Retour à l'accueil</a>
-        <h1 class="subpage-title">Notre Mission</h1>
+        <a href="rotaract.html" class="back-link" data-i18n="back">&larr; Retour à l'accueil</a>
+        <h1 class="subpage-title" data-i18n="title">Notre Mission</h1>
       </div>
     </header>
 
     <!-- Dynamic Content from Supabase -->
     <main class="content-container">
-      <h2>Fédérer, harmoniser et amplifier l'impact</h2>
+      <h2 data-i18n="section-title">Fédérer, harmoniser et amplifier l'impact</h2>
       <div id="mission-text">Chargement de la mission...</div>
     </main>
     </div>
@@ -767,8 +785,16 @@
         <div id="mission-feedback"></div>
         <form id="mission-form">
           <div class="field" style="margin-top: 1.5rem">
-            <label for="admin-mission-text">Texte de la mission</label>
-            <textarea id="admin-mission-text" rows="5"></textarea>
+            <label for="admin-mission-text">Texte de la mission (Français)</label>
+            <textarea id="admin-mission-text" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <label for="admin-mission-text-en">Texte de la mission (English)</label>
+            <textarea id="admin-mission-text-en" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <label for="admin-mission-text-ar">نص المهمة (Arabe)</label>
+            <textarea id="admin-mission-text-ar" rows="4" dir="rtl"></textarea>
           </div>
           <div class="field">
             <label for="admin-mission-img">Image Hero / Illustration (Mission)</label>
@@ -789,8 +815,16 @@
         <div id="structure-feedback"></div>
         <form id="structure-form">
           <div class="field" style="margin-top: 1.5rem">
-            <label for="admin-structure-text">Texte de la structure</label>
-            <textarea id="admin-structure-text" rows="5"></textarea>
+            <label for="admin-structure-text">Texte de la structure (Français)</label>
+            <textarea id="admin-structure-text" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <label for="admin-structure-text-en">Texte de la structure (English)</label>
+            <textarea id="admin-structure-text-en" rows="4"></textarea>
+          </div>
+          <div class="field">
+            <label for="admin-structure-text-ar">نص الهيكل (Arabe)</label>
+            <textarea id="admin-structure-text-ar" rows="4" dir="rtl"></textarea>
           </div>
           <div class="field">
             <label for="admin-structure-img">Image Hero / Illustration (Structure)</label>
@@ -798,7 +832,7 @@
             <span class="helper-text" id="current-structure-img-name"></span>
           </div>
           <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem">Enregistrer la structure</button>
-        
+        </form>
       </div>
     </section>
           <section class="admin-panel" id="panel-account">
@@ -1134,20 +1168,44 @@
 
       const el = (id) => document.getElementById(id);
 
+      function escapeHtml(str) {
+        return String(str ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      let missionDataCache = null;
+
+      function renderMissionText() {
+        if (!missionDataCache) return;
+        const lang = localStorage.getItem("site-lang") || "fr";
+        const text =
+          (lang !== "fr" && missionDataCache[`mission_${lang}`]) ||
+          missionDataCache.mission ||
+          "";
+        if (text) document.getElementById("mission-text").textContent = text;
+      }
+
       async function loadMission() {
         try {
           const { data, error } = await supabaseClient
             .from("coordination_info")
-            .select("mission, mission_image_url")
+            .select("mission, mission_en, mission_ar, mission_image_url")
             .eq("id", 1)
             .single();
 
           if (error) throw error;
           if (data) {
-            if (data.mission) {
-              document.getElementById("mission-text").textContent =
-                data.mission;
-            }
+            missionDataCache = data;
+            renderMissionText();
             if (data.mission_image_url) {
               document.getElementById(
                 "mission-hero"
@@ -1165,6 +1223,74 @@
         }
       }
       loadMission();
+
+      const LANG_CYCLE = ["fr", "en", "ar"];
+      const NEXT_LABEL = { fr: "EN", en: "AR", ar: "FR" };
+      const I18N = {
+        fr: {
+          back: "← Retour à l'accueil",
+          title: "Notre Mission",
+          "section-title": "Fédérer, harmoniser et amplifier l'impact",
+        },
+        en: {
+          back: "← Back to home",
+          title: "Our Mission",
+          "section-title": "Uniting, aligning and amplifying our impact",
+        },
+        ar: {
+          back: "→ العودة إلى الرئيسية",
+          title: "مهمتنا",
+          "section-title": "توحيد وتنسيق وتضخيم الأثر",
+        },
+      };
+
+      function applyLanguage(lang) {
+        if (!LANG_CYCLE.includes(lang)) lang = "fr";
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          const key = node.getAttribute("data-i18n");
+          if (I18N[lang] && I18N[lang][key]) node.textContent = I18N[lang][key];
+        });
+        const toggle = document.getElementById("lang-toggle");
+        if (toggle) toggle.textContent = NEXT_LABEL[lang];
+        localStorage.setItem("site-lang", lang);
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+        renderMissionText();
+      }
+
+      function initLanguageToggle() {
+        const saved = localStorage.getItem("site-lang") || "fr";
+        applyLanguage(saved);
+        const toggle = document.getElementById("lang-toggle");
+        if (toggle) {
+          toggle.addEventListener("click", () => {
+            const current = localStorage.getItem("site-lang") || "fr";
+            const idx = LANG_CYCLE.indexOf(current);
+            applyLanguage(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length]);
+          });
+        }
+      }
+      initLanguageToggle();
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("site-theme", theme);
+        const toggle = document.getElementById("theme-toggle");
+        if (toggle) toggle.textContent = theme === "dark" ? "☀️" : "🌙";
+      }
+
+      function initThemeToggle() {
+        const saved = localStorage.getItem("site-theme") || "light";
+        applyTheme(saved);
+        const toggle = document.getElementById("theme-toggle");
+        if (toggle) {
+          toggle.addEventListener("click", () => {
+            const current = localStorage.getItem("site-theme") || "light";
+            applyTheme(current === "light" ? "dark" : "light");
+          });
+        }
+      }
+      initThemeToggle();
  // ============================================================
       // ROUTAGE : #admin bascule sur l'espace admin, tout le reste
       // reste sur le site public. Un seul fichier, deux "pages".
@@ -1199,44 +1325,8 @@
       // SITE PUBLIC
       // ============================================================
       function initPublic() {
-        el("year").textContent = new Date().getFullYear();
-
-        const navToggle = el("nav-toggle");
-        const mainNav = el("main-nav");
-        navToggle.addEventListener("click", () => {
-          const isOpen = mainNav.classList.toggle("open");
-          navToggle.setAttribute("aria-expanded", String(isOpen));
-        });
-        mainNav
-          .querySelectorAll("a")
-          .forEach((a) =>
-            a.addEventListener("click", () => mainNav.classList.remove("open"))
-          );
-
-        leafletMap = L.map("club-map", { scrollWheelZoom: false }).setView(
-          [34.5, 9.5],
-          6.3
-        );
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          maxZoom: 18,
-        }).addTo(leafletMap);
-
-        leafletMap.on("moveend zoomend", updateZonePanel);
-
-        const modal = el("club-modal");
-        el("modal-close").addEventListener("click", () =>
-          modal.classList.remove("open")
-        );
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) modal.classList.remove("open");
-        });
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") modal.classList.remove("open");
-        });
-
-        loadPublicData();
+        // Cette page n'a besoin d'aucune initialisation supplémentaire :
+        // loadMission() (appelée plus haut) suffit pour le contenu public.
       }
       function makePinIcon(logoUrl, name) {
         const inner = logoUrl
@@ -1607,7 +1697,6 @@
 
         el("mission-form")?.addEventListener("submit", onMissionFormSubmit);
         el("structure-form")?.addEventListener("submit", onStructureFormSubmit);
-        el("content-form").addEventListener("submit", onContentFormSubmit);
         el("add-admin-form").addEventListener("submit", onAddAdminSubmit);
         el("password-form").addEventListener("submit", onPasswordFormSubmit);
 
@@ -1671,7 +1760,6 @@
 
         showScreen("dashboard");
         loadClubs();
-        loadContent();
         loadTeam();
         if (currentAdminRole === "super_admin") loadAdmins();
       }
@@ -1712,6 +1800,8 @@
         try {
           const payload = {
             mission: el("admin-mission-text").value.trim(),
+            mission_en: el("admin-mission-text-en").value.trim(),
+            mission_ar: el("admin-mission-text-ar").value.trim(),
           };
           const file = el("admin-mission-img").files[0];
           if (file) payload.mission_image_url = await uploadImage(file, "pages");
@@ -1744,6 +1834,8 @@
         try {
           const payload = {
             structure: el("admin-structure-text").value.trim(),
+            structure_en: el("admin-structure-text-en").value.trim(),
+            structure_ar: el("admin-structure-text-ar").value.trim(),
           };
           const file = el("admin-structure-img").files[0];
           if (file) payload.structure_image_url = await uploadImage(file, "pages");
@@ -2309,8 +2401,16 @@
           if (document.getElementById("admin-mission-text")) {
             document.getElementById("admin-mission-text").value =
               data.mission || "";
+            document.getElementById("admin-mission-text-en").value =
+              data.mission_en || "";
+            document.getElementById("admin-mission-text-ar").value =
+              data.mission_ar || "";
             document.getElementById("admin-structure-text").value =
               data.structure || "";
+            document.getElementById("admin-structure-text-en").value =
+              data.structure_en || "";
+            document.getElementById("admin-structure-text-ar").value =
+              data.structure_ar || "";
           }
         }
       }
@@ -2318,12 +2418,6 @@
 
       // Appeler le chargement au démarrage de l'admin
       loadAdminCoordinationPages();
-      // Remplace ton L.tileLayer actuel par celui-ci :
-      L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
-        maxZoom: 17,
-        attribution:
-          'Kartendaten: &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-      }).addTo(leafletMap);
     </script>
   </body>
 </html>
